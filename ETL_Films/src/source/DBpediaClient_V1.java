@@ -35,6 +35,7 @@ public class DBpediaClient_V1 {
      * @param year        Si true, traite également l'année (non utilisé ici).
      * @return Une ArrayList contenant les résultats de la requête.
      */
+    //ok comme requete
     private static ArrayList<Object> executeQueryAndGetResults(String queryString, boolean year) {
         ArrayList<Object> resultsList = new ArrayList<>();
         Query query = QueryFactory.create(queryString);
