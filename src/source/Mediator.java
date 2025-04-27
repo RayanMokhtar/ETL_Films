@@ -106,8 +106,22 @@ public class Mediator {
 
         /******************** DBpedia Part *****************************************************/
         for (Movie movie : movies) {
-            // Récupération directe des informations depuis DBpedia (comme dans DBpediaClientTest)
-            ArrayList<ArrayList<Object>> details = dbpediaClient.getMoviesDetails(movie.getTitle());
+            String original = movie.getTitle();
+            // Générer variantes du titre : hyphens, espaces, suppression de ponctuation
+            ArrayList<String> variants = new ArrayList<>();
+            variants.add(original);
+            if (original.contains("-")) variants.add(original.replace('-', ' '));
+            if (original.contains(" ")) variants.add(original.replace(' ', '-'));
+            String stripped = original.replaceAll("[^A-Za-z0-9 ]", " ").trim();
+            if (!variants.contains(stripped)) variants.add(stripped);
+            ArrayList<ArrayList<Object>> details = new ArrayList<>();
+            // Tester chaque variante jusqu'à avoir des résultats
+            for (String var : variants) {
+                details = dbpediaClient.getMoviesDetails(var);
+                boolean hasData = details.size() == 3 && 
+                    (!details.get(0).isEmpty() || !details.get(1).isEmpty() || !details.get(2).isEmpty());
+                if (hasData) break;
+            }
             if (details.size() == 3) {
                 movie.addDirectors(details.get(0));
                 movie.addProducers(details.get(1));
@@ -116,19 +130,26 @@ public class Mediator {
         }
 
         /******************** OMDb API Part *****************************************************/
-        // OMDb API Part
-        for(Movie movie : movies) {
+        for (Movie movie : movies) {
             try {
-                String movieTitleFormatted = movie.getTitle().replace(' ', '+');
-                String releaseYear = String.valueOf(movie.getReleaseDate().toLocalDate().getYear());
-                String plot = OMDbClient.getMovieResume(movieTitleFormatted, releaseYear);
-                if (plot == null || plot.equals("<html>\n<p></p>\n</html>")){
-                    if (movieTitleFormatted.toLowerCase().contains("the")){
-                        movieTitleFormatted = movieTitleFormatted.replace("the", "").replace("The", "").trim();
-                        plot = OMDbClient.getMovieResume(movieTitleFormatted, releaseYear);
+                String original = movie.getTitle();
+                // Générer variantes pour la requête OMDb : espaces, tirets, suppression de ponctuation
+                ArrayList<String> variants = new ArrayList<>();
+                variants.add(original);
+                if (original.contains("-")) variants.add(original.replace('-', ' '));
+                if (original.contains(" ")) variants.add(original.replace(' ', '-'));
+                String stripped = original.replaceAll("[^A-Za-z0-9 ]", " ").trim();
+                if (!variants.contains(stripped)) variants.add(stripped);
+
+                String plot = null;
+                // Tester chaque variante uniquement sur le titre, sans année
+                for (String var : variants) {
+                    String fmt = var.replace(' ', '+');
+                    plot = OMDbClient.getMovieResume(fmt, "");
+                    if (plot != null && !plot.equals("<html>\n<p></p>\n</html>") && !plot.trim().isEmpty()) {
+                        break;
                     }
                 }
-
                 movie.setSummary(plot);
             } catch (Exception e) {
                 logger.log(Level.SEVERE, "Erreur lors de la récupération du résumé du film: " + e.getMessage(), e);
