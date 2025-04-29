@@ -8,6 +8,8 @@ import java.util.HashMap;
 import java.util.Map.Entry;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.io.FileWriter;
+import java.io.IOException;
 
 
 /**
@@ -21,6 +23,8 @@ public class Mediator {
     // Ajout d'un logger pour contrôler les messages
     private static final Logger logger = Logger.getLogger(Mediator.class.getName());
     private static boolean verboseLogging = false; // Par défaut, logging réduit
+    // Fichier de rejet pour les erreurs techniques
+    private static final String REJECT_FILE = "rejected_records.txt";
 
     /**
      * Constructeur du médiateur.
@@ -74,13 +78,11 @@ public class Mediator {
             return movies;
         }
 
-        for (ArrayList<Object> filmTable : filmsTable){
-            // Vérification que les données du film sont complètes
+        for (ArrayList<Object> filmTable : filmsTable) {
             if (filmTable.size() < 7) {
-                logger.warning("Les données du film sont incomplètes, ignoré: " + filmTable);
+                logger.warning("Film ignoré (données incomplètes) : " + filmTable);
                 continue;
             }
-
             try {
                 Movie movie = new Movie();
                 movie.setTitle((String)filmTable.get(0));
@@ -90,11 +92,15 @@ public class Mediator {
                 movie.setBudget((double)filmTable.get(4));
                 movie.setUsaRevenue((double)filmTable.get(5));
                 movie.setWorldwideRevenue((double)filmTable.get(6));
-
                 movies.add(movie);
             } catch (Exception e) {
-                logger.log(Level.SEVERE, "Erreur lors de la création du film: " + e.getMessage(), e);
-                // Continue avec le prochain film
+                logger.log(Level.SEVERE, "Erreur technique, enregistrement rejeté pour : " + filmTable, e);
+                // Écrire dans le fichier de rejet
+                try (FileWriter fw = new FileWriter(REJECT_FILE, true)) {
+                    fw.write(filmTable + " -> " + e.getMessage() + "\n");
+                } catch (IOException ioe) {
+                    logger.log(Level.WARNING, "Impossible d'écrire dans le fichier de rejet", ioe);
+                }
             }
         }
 
@@ -106,22 +112,8 @@ public class Mediator {
 
         /******************** DBpedia Part *****************************************************/
         for (Movie movie : movies) {
-            String original = movie.getTitle();
-            // Générer variantes du titre : hyphens, espaces, suppression de ponctuation
-            ArrayList<String> variants = new ArrayList<>();
-            variants.add(original);
-            if (original.contains("-")) variants.add(original.replace('-', ' '));
-            if (original.contains(" ")) variants.add(original.replace(' ', '-'));
-            String stripped = original.replaceAll("[^A-Za-z0-9 ]", " ").trim();
-            if (!variants.contains(stripped)) variants.add(stripped);
-            ArrayList<ArrayList<Object>> details = new ArrayList<>();
-            // Tester chaque variante jusqu'à avoir des résultats
-            for (String var : variants) {
-                details = dbpediaClient.getMoviesDetails(var);
-                boolean hasData = details.size() == 3 && 
-                    (!details.get(0).isEmpty() || !details.get(1).isEmpty() || !details.get(2).isEmpty());
-                if (hasData) break;
-            }
+            // Enrichissement DBpedia : seulement sur le titre du film
+            ArrayList<ArrayList<Object>> details = dbpediaClient.getMoviesDetails(movie.getTitle());
             if (details.size() == 3) {
                 movie.addDirectors(details.get(0));
                 movie.addProducers(details.get(1));
@@ -157,6 +149,12 @@ public class Mediator {
             }
         }
 
+        // Filtrer les films sans aucune info DBpedia/OMDb (option par défaut)
+        movies.removeIf(m -> m.getDirectors().isEmpty()
+                && m.getProducers().isEmpty()
+                && m.getActors().isEmpty()
+                && (m.getSummary() == null || m.getSummary().trim().isEmpty()));
+
         return movies;
     }
 
@@ -167,115 +165,42 @@ public class Mediator {
      * @param caseSensitive Whether the search should be case-sensitive.
      * @return An ArrayList of Movie objects featuring the specified actor.
      */
-    public ArrayList<Movie> getMoviesByActorName(String actorName, boolean caseSensitive){
-
-        ArrayList<Movie> movies = new ArrayList<Movie>();
-        HashMap<String, Movie> moviesByLabels = new HashMap<>();
-
-        // On récupère les films de l'acteur renseigné
-        ArrayList<Object> moviesLabels = dbpediaClient.getMoviesByActor(actorName, caseSensitive, true);
-
-
-        /******************** JDBC Part *****************************************************/
-
-
-        // Ararylist des films qui n'existent pas
-        ArrayList<Object> notFoundMoviesLabels = new ArrayList<>();
-
-        // On croise les films sql avec les films dpbedia
-        for(Object movieLabel : moviesLabels) {
-            String movieTitle = ((String[])movieLabel)[0].split("\\(")[0].trim();
-            ArrayList<ArrayList<Object>> filmsTable = jdbcClient.getMovieInfo(movieTitle);
-            if(!filmsTable.isEmpty()){
-                for (ArrayList<Object> filmTable : filmsTable){
-                    Movie movie = new Movie();
-
-                    // Pour cette partie je vais extraire l'année de sortie d'un Film avec son nom et les mettre en
-                    // commun pour la exacte dans SPARQL
-                    String releaseYearSql = String.valueOf(((Date)filmTable.get(1)).toLocalDate().getYear());
-                    String releaseYearDbpedia = ((String[])movieLabel)[1];
-                    if (releaseYearDbpedia.equals(releaseYearSql)){
-                        movie.setTitle((String)filmTable.get(0));
-                        movie.setReleaseDate((Date)filmTable.get(1));
-                        movie.setGenre((String)filmTable.get(2));
-                        movie.setDistributor((String)filmTable.get(3));
-                        movie.setBudget((double)filmTable.get(4));
-                        movie.setUsaRevenue((double)filmTable.get(5));
-                        movie.setWorldwideRevenue((double)filmTable.get(6));
-
-                        moviesByLabels.put(((String[])movieLabel)[0], movie);
-                    }
-
-
-                }
+    public ArrayList<Movie> getMoviesByActorName(String actorName, boolean caseSensitive) {
+        ArrayList<Movie> movies = new ArrayList<>();
+        // Récupère liste des titres de films via SPARQL
+        ArrayList<Object> actorResults = dbpediaClient.getMoviesByActor(actorName, caseSensitive, true);
+        for (Object entry : actorResults) {
+            String[] data = (String[]) entry;  // [0]=titre, [1]=année ou null
+            String title = data[0].split("\\(")[0].trim();
+            // Intersection avec la base locale : ne traiter que si présent en JDBC
+            ArrayList<ArrayList<Object>> tbl = jdbcClient.getMovieInfo(title);
+            if (tbl == null || tbl.isEmpty()) {
+                // Pas dans la base locale, on ignore
+                continue;
             }
-            else {
-                notFoundMoviesLabels.add(movieLabel);
+            // Création de l'objet Movie à partir des données SQL
+            ArrayList<Object> row = tbl.get(0);
+            Movie movie = new Movie();
+            movie.setTitle((String) row.get(0));
+            movie.setReleaseDate((Date) row.get(1));
+            movie.setGenre((String) row.get(2));
+            movie.setDistributor((String) row.get(3));
+            movie.setBudget((double) row.get(4));
+            movie.setUsaRevenue((double) row.get(5));
+            movie.setWorldwideRevenue((double) row.get(6));
+            // Enrichissement DBpedia
+            ArrayList<ArrayList<Object>> details = dbpediaClient.getMoviesDetails(title);
+            if (details.size() == 3) {
+                movie.addDirectors(details.get(0));
+                movie.addProducers(details.get(1));
+                movie.addActors(details.get(2));
             }
-
-        }
-
-        moviesLabels.removeAll(notFoundMoviesLabels);
-        // Affichage des labels inexistants dans la bd sql
-        if (verboseLogging) {
-            logger.info("Films de "+ actorName +" non trouvés :");
-            for (Object movieObject: notFoundMoviesLabels){
-                String movieLabel = ((String[])movieObject)[0];
-                logger.info(movieLabel);
-            }
-        }
-
-        // Pour cette partie je vais extraire l'année de sortie d'un Film avec son nom et les mettre en commun pour la
-        // exacte dans SPARQL
-
-
-        /******************** DBpedia Part *****************************************************/
-        // DBPedia Part
-        // With movies I'm gonna extract actors, directors, producers
-        for (Entry<String, Movie> movieByLabel : moviesByLabels.entrySet()){
-            String filmLabel = movieByLabel.getKey();
-            Movie movie = movieByLabel.getValue();
-
-            // Case sensitive research or not
-            ArrayList<ArrayList<Object>> moviesDetails = dbpediaClient.getMoviesDetails(filmLabel/*, caseSensitive*/);
-            ArrayList<Object> directors = moviesDetails.get(0);
-            ArrayList<Object> producers = moviesDetails.get(1);
-            ArrayList<Object> actors = moviesDetails.get(2);
-            if (actors.size() > 0){
-                movie.addActors(actors);
-            }
-            if (directors.size() > 0){
-                movie.addDirectors(directors);
-            }
-            if (producers.size() > 0){
-                movie.addProducers(producers);
-            }
-
-            // Transfert des données
-            movies.add(movie);
-
-        }
-
-
-        /******************** OMDb API Part *****************************************************/
-        // OMDb API Part
-        for(Movie movie : movies) {
-            String movieTitleFormatted = movie.getTitle().replace(' ', '+');
-            String releaseYear = String.valueOf(movie.getReleaseDate().toLocalDate().getYear());
-            String plot = OMDbClient.getMovieResume(movieTitleFormatted, releaseYear);
-            if (plot == null || plot.equals("<html>\n<p></p>\n</html>")){
-                if (movieTitleFormatted.toLowerCase().contains("the")){
-                    movieTitleFormatted = movieTitleFormatted.replace("the", "").replace("The", "").trim();
-                    plot = OMDbClient.getMovieResume(movieTitleFormatted, releaseYear);
-                }
-            }
-
+            // Enrichissement OMDb
+            String plot = omdbClient.getMovieResume(title.replace(' ', '+'), "");
             movie.setSummary(plot);
+            movies.add(movie);
         }
-
         return movies;
-        
-       
     }
 
     /**

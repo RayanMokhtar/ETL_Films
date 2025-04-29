@@ -1,16 +1,18 @@
 package source;
 
-import java.net.HttpURLConnection;
-import java.net.URL;
-import java.net.URLEncoder;
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
+import org.apache.jena.query.Query;
+import org.apache.jena.query.QueryExecution;
+import org.apache.jena.query.QueryExecutionFactory;
+import org.apache.jena.query.QueryFactory;
+import org.apache.jena.query.ResultSet;
+import org.apache.jena.query.QuerySolution;
+import org.apache.jena.rdf.model.Literal;
 import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
- * SPARQL client for DBpedia using HTTP CSV format (pas de dépendance Jena).
+ * SPARQL client for DBpedia using Jena API.
  */
 public class DBpediaClient {
 
@@ -27,67 +29,52 @@ public class DBpediaClient {
         "PREFIX skos:   <http://www.w3.org/2004/02/skos/core#>\n" +
         "PREFIX bif:   <http://www.openlinksw.com/schemas/bif#>\n";
 
-    private static final String ENDPOINT = "https://dbpedia.org/sparql?format=text/csv&query=";
+    private static final String ENDPOINT = "https://dbpedia.org/sparql";
     private static final Logger logger = Logger.getLogger(DBpediaClient.class.getName());
     static { logger.setLevel(Level.WARNING); }
 
-    // Exécute une requête SPARQL retournant du CSV, renvoie les lignes (sans entête)
-    private ArrayList<String[]> executeQuery(String sparql) {
-        ArrayList<String[]> rows = new ArrayList<>();
-        try {
-            String urlStr = ENDPOINT + URLEncoder.encode(sparql, "UTF-8");
-            HttpURLConnection conn = (HttpURLConnection) new URL(urlStr).openConnection();
-            conn.setRequestMethod("GET");
-            conn.setRequestProperty("Accept", "text/csv");
-            if (conn.getResponseCode() != 200) return rows;
-            try (BufferedReader br = new BufferedReader(new InputStreamReader(conn.getInputStream()))) {
-                String line;
-                while ((line = br.readLine()) != null) {
-                    // Split CSV en tenant compte des guillemets
-                    rows.add(line.split(",(?=(?:[^\"]*\"[^\"]*\")*[^\"]*$)", -1));
-                }
-            }
+    // Exécute une requête SPARQL via Jena et retourne le ResultSet
+    private ResultSet executeQuery(String sparql) {
+        Query query = QueryFactory.create(sparql);
+        try (QueryExecution qexec = QueryExecutionFactory.sparqlService(ENDPOINT, query)) {
+            return qexec.execSelect();
         } catch (Exception e) {
-            logger.log(Level.WARNING, "executeQuery failed", e);
+            logger.log(Level.WARNING, "SPARQL query failed: " + e.getMessage(), e);
+            return null;
         }
-        if (!rows.isEmpty()) rows.remove(0); // supprimer l'entête
-        return rows;
     }
 
+    /**
+     * Récupère les réalisateurs, producteurs et acteurs d'un film DBpedia en se basant sur son titre.
+     * @param title Titre du film recherché
+     * @return Trois listes : réalisateurs, producteurs, acteurs
+     */
     public ArrayList<ArrayList<Object>> getMoviesDetails(String title) {
-        // Requête SPARQL unique avec GROUP_CONCAT, full-text sur le titre via bif:contains
+        String esc = title.replace("'","\\'");
         String sparql = PREFIXES +
             "SELECT (GROUP_CONCAT(DISTINCT ?dirLabel; SEPARATOR=\", \" ) AS ?Directors) " +
             "(GROUP_CONCAT(DISTINCT ?prodLabel; SEPARATOR=\", \" ) AS ?Producers) " +
             "(GROUP_CONCAT(DISTINCT ?actorLabel; SEPARATOR=\", \" ) AS ?Actors) WHERE {" +
-            "  ?film a dbo:Film; rdfs:label ?title. " +
-            "  FILTER(lang(?title)='en'). " +
-            "  ?title bif:contains '\"" + title.replace("'","\\'") + "\"'." +
+            "  ?film a dbo:Film; rdfs:label ?titleVar. " +
+            "  FILTER(lang(?titleVar)='en'). " +
+            "  ?titleVar bif:contains '\"" + esc + "\"'." +
             "  OPTIONAL { ?film (dbo:director|dbp:director) ?dir. ?dir rdfs:label ?dirLabel FILTER(lang(?dirLabel)='en') }." +
             "  OPTIONAL { ?film (dbo:producer|dbp:producer|dbp:producers) ?prod. ?prod rdfs:label ?prodLabel FILTER(lang(?prodLabel)='en') }." +
             "  OPTIONAL { ?film (dbo:starring|dbp:starring) ?actor. ?actor rdfs:label ?actorLabel FILTER(lang(?actorLabel)='en') }." +
-            "} GROUP BY ?film ?title LIMIT 1";
-        ArrayList<String[]> rows = executeQuery(sparql);
+            "} GROUP BY ?film ?titleVar LIMIT 1";
+        ResultSet rs = executeQuery(sparql);
         ArrayList<ArrayList<Object>> out = new ArrayList<>();
-        if (rows.isEmpty()) return out;
-        String[] data = rows.get(0);
-        // data[0]=Directors CSV, [1]=Producers CSV, [2]=Actors CSV
-        // Split puis nettoyer chaque élément des éventuelles guillemets
-        ArrayList<Object> listDirs = new ArrayList<>();
-        for (String d : data[0].isEmpty() ? new String[0] : data[0].split(",\\s*")) {
-            listDirs.add(d.replaceAll("^\"|\"$", "").trim());
+        if (rs == null || !rs.hasNext()) return out;
+        QuerySolution sol = rs.nextSolution();
+        String[] vars = {"Directors","Producers","Actors"};
+        for (String v : vars) {
+            ArrayList<Object> list = new ArrayList<>();
+            Literal lit = sol.getLiteral(v);
+            if (lit != null) {
+                for (String e : lit.getString().split(",\\s*")) list.add(e.trim());
+            }
+            out.add(list);
         }
-        ArrayList<Object> listProds = new ArrayList<>();
-        for (String p : data[1].isEmpty() ? new String[0] : data[1].split(",\\s*")) {
-            listProds.add(p.replaceAll("^\"|\"$", "").trim());
-        }
-        ArrayList<Object> listActors = new ArrayList<>();
-        for (String a : data[2].isEmpty() ? new String[0] : data[2].split(",\\s*")) {
-            listActors.add(a.replaceAll("^\"|\"$", "").trim());
-        }
-        out.add(listDirs);
-        out.add(listProds);
-        out.add(listActors);
         return out;
     }
 
@@ -95,21 +82,39 @@ public class DBpediaClient {
         ArrayList<Object> list = new ArrayList<>();
         String sparql = PREFIXES +
             "SELECT DISTINCT ?label WHERE { <" + uri + "> (" + props + ") ?p. ?p rdfs:label ?label FILTER(lang(?label)='en') }";
-        for (String[] row : executeQuery(sparql)) {
-            String v = row[0].replaceAll("^\"|\"$","").trim();
+        ResultSet rs = executeQuery(sparql);
+        while (rs.hasNext()) {
+            QuerySolution sol = rs.nextSolution();
+            String v = sol.getLiteral("label").getString().trim();
             list.add(v);
         }
         return list;
     }
 
+    /**
+     * Recherche la liste des titres de films dans lesquels un acteur donné a joué.
+     * Utilise bif:contains pour matcher l'acteur et ne retourne que `movieLabel`.
+     * @param actorName Nom de l'acteur
+     */
     public ArrayList<Object> getMoviesByActor(String actorName, boolean caseSensitive, boolean includeYear) {
         ArrayList<Object> results = new ArrayList<>();
         String esc = actorName.replace("'","\\'");
         String sparql = PREFIXES +
-            "SELECT ?movieLabel ?year WHERE { ?actor rdfs:label ?actorLabel; <http://www.openlinksw.com/schemas/virtrdf#contains> '" + esc + "'. FILTER(lang(?actorLabel)='en') " +
-            "?movie a dbo:Film; dbo:starring ?actor; rdfs:label ?movieLabel; dbo:releaseDate ?date. FILTER(lang(?movieLabel)='en') BIND(YEAR(?date) AS ?year) } ORDER BY ?movieLabel LIMIT 100";
-        for (String[] row : executeQuery(sparql)) {
-            results.add(new String[]{ row[0], row[1] });
+            "SELECT DISTINCT ?movieLabel WHERE {" +
+            "  ?actor rdfs:label ?actorLabel. " +
+            "  FILTER(lang(?actorLabel)='en' && bif:contains(?actorLabel, '\"" + esc + "\"')). " +
+            "  ?movie a dbo:Film; (dbo:starring|dbp:starring) ?actor; rdfs:label ?movieLabel. " +
+            "  FILTER(lang(?movieLabel)='en')." +
+            "} ORDER BY ?movieLabel LIMIT 100";
+        ResultSet rs = executeQuery(sparql);
+        if (rs == null) {
+            logger.warning("No results for actor query, possible SPARQL endpoint error");
+            return results;
+        }
+        while (rs.hasNext()) {
+            QuerySolution sol = rs.nextSolution();
+            String movieLabel = sol.getLiteral("movieLabel").getString();
+            results.add(new String[]{ movieLabel });
         }
         return results;
     }
@@ -123,12 +128,11 @@ public class DBpediaClient {
         String esc = movieTitle.replace("'","\\'");
         String sparql = PREFIXES +
             "SELECT DISTINCT ?movieLabel WHERE {" +
-            "  ?movie a dbo:Film; rdfs:label ?movieLabel." +
-            "  ?movie <http://www.openlinksw.com/schemas/virtrdf#contains> '" + esc + "'." +
-            "  FILTER(lang(?movieLabel)='en')" +
+            "  ?movie a dbo:Film; rdfs:label ?movieLabel. FILTER(lang(?movieLabel)='en'&& regex(?movieLabel,'"+esc+"','i'))" +
             "} LIMIT 1";
-        ArrayList<String[]> rows = executeQuery(sparql);
-        return rows.isEmpty() ? null : rows.get(0)[0].replaceAll("^\"|\"$","").trim();
+        ResultSet rs = executeQuery(sparql);
+        if (!rs.hasNext()) return null;
+        return rs.nextSolution().getLiteral("movieLabel").getString();
     }
 
     public static void setLogLevel(Level lvl) {
