@@ -36,6 +36,7 @@ public class TheNumbersScraper {
 							String title = cells.get(1).text(); // Titre du film
 							if (title.endsWith("…")) {
 								// On récupère l'adresse de la page de description du film
+								//un peu moche , à voir si on peut récupérer avec un découpage plus propre 
 								String filmUrl = "http://www.the-numbers.com" + cells.get(1).child(0).child(0).attribute("href").getValue();
 
 								Document docFilm = Jsoup.connect(filmUrl).get();
@@ -48,7 +49,7 @@ public class TheNumbersScraper {
 							String distributor = cells.get(3).text(); // Distributeur du film
 
 							if (distributor.endsWith("…")){
-								// On récupère l'adresse de la page de description du film
+								//on récupère l'adresse de la page de description du film => car tout n'esr pas dispo
 								String distributorUrl = "http://www.the-numbers.com" + cells.get(3).child(0).attribute("href").getValue();
 								if(!distributors_unformatted.contains(distributor)) {
 									// Récupération de la page HTML
@@ -69,7 +70,7 @@ public class TheNumbersScraper {
 									distributor = distributorsEquiv.get(distributor);
 								}
 							}
-							// Écrire les informations dans le fichier CSV
+							//écrire chaque element
 							writer.append(genre + ";" + year + ";" + title  + ";" + distributor + "\n");
 						}
 					}

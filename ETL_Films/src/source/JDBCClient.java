@@ -10,11 +10,11 @@ import java.util.ArrayList;
  * Provides methods to interact with a MySQL database using JDBC.
  */
 public class JDBCClient {
-    private static final String HOST = "mysql-museevasion.alwaysdata.net";
-    private static final String BASE = "museevasion_movies_budgets";
-    private static final String USER = "332768";
+    private static final String HOST = "mysql-mokhtari-rayan.alwaysdata.net";
+    private static final String BASE = "mokhtari-rayan_etl";
+    private static final String USER ="327071";
 //    private static final String USER = "root";
-    private static final String PASSWORD = "Pmlpmlpmlk0+";
+    private static final String PASSWORD = "AZERTYUIO2";
 //    private static final String PASSWORD = "";
 
     private Connection connection;
@@ -78,8 +78,8 @@ public class JDBCClient {
     public ArrayList<ArrayList<Object>> getMovieInfo(String search){
         Statement statement = createStatement(this.connection);
 
-        String query = "SELECT * FROM film" +
-                " WHERE film.title LIKE \"%" + search +"%\" ";
+        String query = "SELECT * FROM Film as f" +
+                " WHERE f.movie LIKE \"%" + search +"%\" ";
 
         ArrayList<ArrayList<Object>> filmsTable = new ArrayList<>();
         try {
@@ -87,20 +87,20 @@ public class JDBCClient {
 
             while (resultSet.next()) {
                 // Récupérer les données par nom de colonne
-                String title = resultSet.getString("title");
+                String title = resultSet.getString("movie");
                 Date releaseDate = resultSet.getDate("release_date");
                 String genre = resultSet.getString("genre");
-                String distributor = resultSet.getString("distributor");
-                double budget = resultSet.getDouble("budget");
-                double usaRevenue = resultSet.getDouble("usa_revenue");
-                double worldwideRevenue = resultSet.getDouble("worldwide_revenue");
+                String distributor = resultSet.getString("distributeur");
+                double productionBudget = resultSet.getDouble("production_budget");
+                double domesticGross = resultSet.getDouble("domestic_gross");
+                double worldwideRevenue = resultSet.getDouble("worldwide_gross");
                 ArrayList<Object> filmTable = new ArrayList<>(6);
                 filmTable.add(title);
                 filmTable.add(releaseDate);
                 filmTable.add(genre);
                 filmTable.add(distributor);
-                filmTable.add(budget);
-                filmTable.add(usaRevenue);
+                filmTable.add(productionBudget);
+                filmTable.add(domesticGross);
                 filmTable.add(worldwideRevenue);
 
                 filmsTable.add(filmTable);
