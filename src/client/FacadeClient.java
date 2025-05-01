@@ -1,16 +1,16 @@
 package client;
 
-import javax.swing.*;
-import javax.swing.border.*;
-import javax.swing.event.*;
-import javax.swing.table.*;
-import javax.swing.plaf.basic.BasicProgressBarUI;
+import core.Movie;
 import java.awt.*;
 import java.awt.event.*;
 import java.awt.geom.*;
 import java.util.List;
 import java.util.regex.Pattern;
-import core.Movie;
+import javax.swing.*;
+import javax.swing.border.*;
+import javax.swing.event.*;
+import javax.swing.plaf.basic.BasicProgressBarUI;
+import javax.swing.table.*;
 import repository.Mediator;
 
 public class FacadeClient {
@@ -201,7 +201,8 @@ public class FacadeClient {
                 isSearching = false;
             }
         });
-
+        	
+        // logique swing pour ihm ....
         JPanel resultsPanel = new JPanel(new BorderLayout(0,10)); resultsPanel.setBackground(backgroundColor);
         JLabel resultsTitle = new JLabel("Résultats de recherche"); resultsTitle.setFont(new Font("Segoe UI",Font.BOLD,18)); resultsTitle.setForeground(primaryColor);
         DefaultTableModel tableModel = new DefaultTableModel(){@Override public boolean isCellEditable(int r,int c){return false;}};
@@ -243,36 +244,55 @@ public class FacadeClient {
             new SwingWorker<List<Movie>,Void>(){@Override protected List<Movie> doInBackground() throws Exception {boolean cs=false; return searchOptions.getSelectedIndex()==0?mediator.getMoviesByTitle(search,cs):mediator.getMoviesByActorName(search,cs);} 
             @Override protected void done(){try {List<Movie> movies=get();((TimerActionListener)progressController).finishSearching();if(movies.isEmpty()){resultsTitle.setText("Aucun résultat pour : \""+search+"\"");statusLabel.setText("Aucun résultat trouvé.");statusLabel.setForeground(accentColor);JOptionPane.showMessageDialog(frame,"Aucun résultat trouvé pour \""+search+"\".","Recherche terminée",JOptionPane.INFORMATION_MESSAGE);} else{
                 for (Movie m : movies) {
-                    // Remplacer attributs vides par "non mentionné"
-                    String title = m.getStringTitle();
-                    String date = m.getStringReleaseDate();
-                    String genre = m.getStringGenre();
-                    String distributor = m.getStringDistributor();
-                    String budget = m.getStringBudget();
-                    String usa = m.getStringUsaRevenue();
-                    String worldwide = m.getStringWorldwideRevenue();
-                    String directors = m.getStringHTMLDirectors();
-                    String actors = m.getStringHTMLActors();
-                    String producers = m.getStringHTMLProducers();
-                    String summary = m.getSummary();
-                    // setter défaut
-                    String def = "non mentionné";
-                    if (title == null || title.trim().isEmpty()) title = def;
-                    if (date == null || date.trim().isEmpty()) date = def;
-                    if (genre == null || genre.trim().isEmpty()) genre = def;
-                    if (distributor == null || distributor.trim().isEmpty()) distributor = def;
-                    if (budget == null || budget.trim().isEmpty()) budget = def;
-                    if (usa == null || usa.trim().isEmpty()) usa = def;
-                    if (worldwide == null || worldwide.trim().isEmpty()) worldwide = def;
-                    if (directors == null || directors.trim().isEmpty()) directors = def;
-                    if (actors == null || actors.trim().isEmpty()) actors = def;
-                    if (producers == null || producers.trim().isEmpty()) producers = def;
-                    if (summary == null || summary.trim().isEmpty()) summary = def;
-                    tableModel.addRow(new Object[]{title, date, genre, distributor, budget, usa, worldwide, directors, actors, producers, summary});
+                    Object[] rowData = {
+                        formatField(m.getTitle(), m.getStringTitle()),
+                        formatField(m.getReleaseDate(), m.getStringReleaseDate()),
+                        formatField(m.getGenre(), m.getStringGenre()),
+                        formatField(m.getDistributor(), m.getStringDistributor()),
+                        formatField(m.getBudget() > 0 ? m.getBudget() : null, m.getStringBudget()),
+                        formatField(m.getUsaRevenue() > 0 ? m.getUsaRevenue() : null, m.getStringUsaRevenue()),
+                        formatField(m.getWorldwideRevenue() > 0 ? m.getWorldwideRevenue() : null, m.getStringWorldwideRevenue()),
+                        formatField(!m.getDirectors().isEmpty(), m.getStringHTMLDirectors()),
+                        formatField(!m.getActors().isEmpty(), m.getStringHTMLActors()),
+                        formatField(!m.getProducers().isEmpty(), m.getStringHTMLProducers()),
+                        formatField(m.getSummary(), m.getSummary())
+                    };
+                    tableModel.addRow(rowData);    
+                
                 }
                 resultsTitle.setText(movies.size()+" film(s) trouvé(s) pour : \""+search+"\"");statusLabel.setText("Recherche terminée avec succès. Double-cliquez sur un film pour plus de détails.");statusLabel.setForeground(successColor);} } catch(Exception ex){((TimerActionListener)progressController).finishSearching();resultsTitle.setText("Erreur de recherche");statusLabel.setText("Erreur lors de la recherche: "+ex.getMessage());statusLabel.setForeground(accentColor);ex.printStackTrace();JOptionPane.showMessageDialog(frame,"Une erreur est survenue : "+ex.getMessage(),"Erreur",JOptionPane.ERROR_MESSAGE);}finally{searchButton.setEnabled(true);} }}.execute(); }});
         inputField.addKeyListener(new KeyAdapter(){@Override public void keyPressed(KeyEvent e){if(e.getKeyCode()==KeyEvent.VK_ENTER&&searchButton.isEnabled()){searchButton.doClick();}}});
         frame.setVisible(true);
+    }
+
+    private static String formatField(Object value, String formattedValue) {
+        // Cas 1: La valeur est null
+        if (value == null) {
+            return "<html><p style='color:#999999;'><i>n'est pas mentionné</i></p></html>";
+        }
+        
+        // Cas 2: La valeur est une chaîne
+        if (value instanceof String) {
+            String stringValue = ((String)value).trim();
+            // cas spécifiques pour résumé également => on gère ça dans le retour api 
+            if (stringValue.isEmpty() || 
+                stringValue.equals("N/A") || 
+                stringValue.equals("null") ||
+                stringValue.equals("<html>\n<p></p>\n</html>") ||
+                stringValue.equals("<html>\n<p>No plot available.</p>\n</html>")) {
+                return "<html><p style='color:#999999;'><i>n'est pas mentionné</i></p></html>";
+            }
+        }
+        
+        // Cas 3: La valeur est un booléen
+        if (value instanceof Boolean) {
+            if (!(Boolean)value) {
+                return "<html><p style='color:#999999;'><i>n'est pas mentionné</i></p></html>";
+            }
+        }
+        
+        // Si la valeur est valide, on retourne la version formatée
+        return formattedValue;
     }
 
     private static void updateSuggestions() {
