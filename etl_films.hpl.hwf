@@ -1,0 +1,301 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<workflow>
+  <name>etl_films_workflow</name>
+  <name_sync_with_filename>N</name_sync_with_filename>
+  <description/>
+  <extended_description/>
+  <workflow_version/>
+  <workflow_status>0</workflow_status>
+  <created_user>-</created_user>
+  <created_date>2025/04/20 20:43:54.975</created_date>
+  <modified_user>-</modified_user>
+  <modified_date>2025/04/20 20:43:54.975</modified_date>
+  <parameters>
+    </parameters>
+  <actions>
+    <action>
+      <name>Start</name>
+      <description/>
+      <type>SPECIAL</type>
+      <attributes/>
+      <DayOfMonth>1</DayOfMonth>
+      <hour>12</hour>
+      <intervalMinutes>60</intervalMinutes>
+      <intervalSeconds>0</intervalSeconds>
+      <minutes>0</minutes>
+      <repeat>N</repeat>
+      <schedulerType>0</schedulerType>
+      <weekDay>1</weekDay>
+      <parallel>Y</parallel>
+      <xloc>48</xloc>
+      <yloc>224</yloc>
+      <attributes_hac/>
+    </action>
+    <action>
+      <name>verifier existence budgets.csv</name>
+      <description/>
+      <type>FILES_EXIST</type>
+      <attributes/>
+      <filename>C:\Users\mokht\git\ETL_Films\ETL_Films\movieBuets.csv</filename>
+      <fields>
+        <field>
+          <name>C:\Users\mokht\git\ETL_Films\ETL_Films\movieB=udgets.csv</name>
+        </field>
+      </fields>
+      <parallel>N</parallel>
+      <xloc>240</xloc>
+      <yloc>112</yloc>
+      <attributes_hac/>
+    </action>
+    <action>
+      <name>verifier existence scrapping.csv</name>
+      <description/>
+      <type>FILES_EXIST</type>
+      <attributes/>
+      <filename>C:\Users\mokht\git\ETL_Films\ETL_Films\films.csv</filename>
+      <fields>
+      </fields>
+      <parallel>Y</parallel>
+      <xloc>256</xloc>
+      <yloc>272</yloc>
+      <attributes_hac/>
+    </action>
+    <action>
+      <name>etl_films.hpl</name>
+      <description/>
+      <type>PIPELINE</type>
+      <attributes/>
+      <add_date>N</add_date>
+      <add_time>N</add_time>
+      <clear_files>N</clear_files>
+      <clear_rows>N</clear_rows>
+      <create_parent_folder>N</create_parent_folder>
+      <exec_per_row>N</exec_per_row>
+      <filename>C:\Users\mokht\Desktop\ied\hop\etl_films.hpl</filename>
+      <loglevel>Basic</loglevel>
+      <parameters>
+        <pass_all_parameters>Y</pass_all_parameters>
+      </parameters>
+      <params_from_previous>N</params_from_previous>
+      <run_configuration>local</run_configuration>
+      <set_append_logfile>N</set_append_logfile>
+      <set_logfile>N</set_logfile>
+      <wait_until_finished>Y</wait_until_finished>
+      <parallel>N</parallel>
+      <xloc>624</xloc>
+      <yloc>272</yloc>
+      <attributes_hac/>
+    </action>
+    <action>
+      <name>Check DB connections</name>
+      <description/>
+      <type>CHECK_DB_CONNECTIONS</type>
+      <attributes/>
+      <connections>
+        <connection>
+          <name>mysql connexion</name>
+          <waitfor>1</waitfor>
+          <waittime>minute</waittime>
+        </connection>
+      </connections>
+      <parallel>N</parallel>
+      <xloc>272</xloc>
+      <yloc>432</yloc>
+      <attributes_hac/>
+    </action>
+    <action>
+      <name>echec workflow</name>
+      <description/>
+      <type>ABORT</type>
+      <attributes/>
+      <always_log_rows>Y</always_log_rows>
+      <message>echec workflow </message>
+      <parallel>N</parallel>
+      <xloc>624</xloc>
+      <yloc>128</yloc>
+      <attributes_hac/>
+    </action>
+    <action>
+      <name>notifier administrateurs echec</name>
+      <description/>
+      <type>MAIL</type>
+      <attributes/>
+      <server>smtp-mokhtari-rayan.alwaysdata.net</server>
+      <port>587</port>
+      <destination>mokhtarirayan04@gmail.com</destination>
+      <destinationCc/>
+      <destinationBCc/>
+      <replyto>mokhtari-rayan@alwaysdata.net</replyto>
+      <replytoname>headofTrading</replytoname>
+      <subject>workflow abortion</subject>
+      <include_date>Y</include_date>
+      <contact_person/>
+      <contact_phone/>
+      <comment>le workflow a été interrompu ..
+
+</comment>
+      <include_files>Y</include_files>
+      <zip_files>N</zip_files>
+      <zip_name/>
+      <use_auth>Y</use_auth>
+      <usexoauth2>N</usexoauth2>
+      <use_secure_auth>Y</use_secure_auth>
+      <auth_user>mokhtari-rayan@alwaysdata.net</auth_user>
+      <auth_password>Encrypted 2be98afc86ae6a8a1992d9745f7bdfd9b</auth_password>
+      <only_comment>Y</only_comment>
+      <use_HTML>N</use_HTML>
+      <use_Priority>N</use_Priority>
+      <encoding>UTF-8</encoding>
+      <priority>normal</priority>
+      <importance>normal</importance>
+      <sensitivity>normal</sensitivity>
+      <secureconnectiontype>TLS</secureconnectiontype>
+      <replyToAddresses/>
+      <filetypes>
+        <filetype>GENERAL</filetype>
+        <filetype>LOG</filetype>
+        <filetype>ERRORLINE</filetype>
+        <filetype>ERROR</filetype>
+        <filetype>WARNING</filetype>
+      </filetypes>
+      <embeddedimages>
+      </embeddedimages>
+      <parallel>N</parallel>
+      <xloc>1008</xloc>
+      <yloc>128</yloc>
+      <attributes_hac/>
+    </action>
+    <action>
+      <name>notifier administrateurs succès</name>
+      <description/>
+      <type>MAIL</type>
+      <attributes/>
+      <server>smtp.ethereal.email</server>
+      <port>587</port>
+      <destination>mokhtarirayan04@gmail.com</destination>
+      <destinationCc>taghelitwassim@gmail.com</destinationCc>
+      <destinationBCc/>
+      <replyto>chelsie.little@ethereal.email</replyto>
+      <replytoname>Chelsie Little</replytoname>
+      <subject>workflow abortion</subject>
+      <include_date>Y</include_date>
+      <contact_person/>
+      <contact_phone/>
+      <comment>le workflow a été interrompu ..
+
+</comment>
+      <include_files>Y</include_files>
+      <zip_files>N</zip_files>
+      <zip_name/>
+      <use_auth>Y</use_auth>
+      <usexoauth2>N</usexoauth2>
+      <use_secure_auth>Y</use_secure_auth>
+      <auth_user>chelsie.little@ethereal.email</auth_user>
+      <auth_password>Encrypted 5864eee9c4825e9380d0b93d8664f5b5bbee</auth_password>
+      <only_comment>Y</only_comment>
+      <use_HTML>N</use_HTML>
+      <use_Priority>N</use_Priority>
+      <encoding>UTF-8</encoding>
+      <priority>normal</priority>
+      <importance>normal</importance>
+      <sensitivity>normal</sensitivity>
+      <secureconnectiontype>TLS</secureconnectiontype>
+      <replyToAddresses/>
+      <filetypes>
+        <filetype>GENERAL</filetype>
+        <filetype>LOG</filetype>
+        <filetype>ERRORLINE</filetype>
+        <filetype>ERROR</filetype>
+        <filetype>WARNING</filetype>
+      </filetypes>
+      <embeddedimages>
+      </embeddedimages>
+      <parallel>N</parallel>
+      <xloc>1008</xloc>
+      <yloc>272</yloc>
+      <attributes_hac/>
+    </action>
+  </actions>
+  <hops>
+    <hop>
+      <from>Start</from>
+      <to>verifier existence budgets.csv</to>
+      <enabled>Y</enabled>
+      <evaluation>Y</evaluation>
+      <unconditional>Y</unconditional>
+    </hop>
+    <hop>
+      <from>Start</from>
+      <to>verifier existence scrapping.csv</to>
+      <enabled>Y</enabled>
+      <evaluation>Y</evaluation>
+      <unconditional>Y</unconditional>
+    </hop>
+    <hop>
+      <from>Start</from>
+      <to>Check DB connections</to>
+      <enabled>Y</enabled>
+      <evaluation>Y</evaluation>
+      <unconditional>Y</unconditional>
+    </hop>
+    <hop>
+      <from>verifier existence budgets.csv</from>
+      <to>etl_films.hpl</to>
+      <enabled>Y</enabled>
+      <evaluation>Y</evaluation>
+      <unconditional>N</unconditional>
+    </hop>
+    <hop>
+      <from>verifier existence scrapping.csv</from>
+      <to>echec workflow</to>
+      <enabled>Y</enabled>
+      <evaluation>N</evaluation>
+      <unconditional>N</unconditional>
+    </hop>
+    <hop>
+      <from>verifier existence scrapping.csv</from>
+      <to>etl_films.hpl</to>
+      <enabled>Y</enabled>
+      <evaluation>Y</evaluation>
+      <unconditional>N</unconditional>
+    </hop>
+    <hop>
+      <from>echec workflow</from>
+      <to>notifier administrateurs echec</to>
+      <enabled>Y</enabled>
+      <evaluation>Y</evaluation>
+      <unconditional>N</unconditional>
+    </hop>
+    <hop>
+      <from>Check DB connections</from>
+      <to>etl_films.hpl</to>
+      <enabled>Y</enabled>
+      <evaluation>Y</evaluation>
+      <unconditional>N</unconditional>
+    </hop>
+    <hop>
+      <from>etl_films.hpl</from>
+      <to>notifier administrateurs succès</to>
+      <enabled>Y</enabled>
+      <evaluation>Y</evaluation>
+      <unconditional>N</unconditional>
+    </hop>
+    <hop>
+      <from>Check DB connections</from>
+      <to>echec workflow</to>
+      <enabled>Y</enabled>
+      <evaluation>N</evaluation>
+      <unconditional>N</unconditional>
+    </hop>
+    <hop>
+      <from>verifier existence budgets.csv</from>
+      <to>echec workflow</to>
+      <enabled>Y</enabled>
+      <evaluation>N</evaluation>
+      <unconditional>N</unconditional>
+    </hop>
+  </hops>
+  <notepads>
+  </notepads>
+  <attributes/>
+</workflow>
