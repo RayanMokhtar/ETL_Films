@@ -1,8 +1,7 @@
-package data;
+package core;
 
 import java.sql.Date;
 import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Represents a movie with details such as title, release date, genre,
@@ -159,8 +158,7 @@ public class Movie {
             StringBuilder sb = new StringBuilder();
             sb.append("<html>\n");
             for (String element : this.directors) {
-                String clean = element.replace("\"", "").trim();
-                sb.append("<p>\n").append(clean).append("</p>\n");
+                sb.append("<p>\n").append(element).append("</p>\n");
             }
             // Supprimer la virgule et l'espace supplémentaires à la fin
             sb.substring(0, sb.length() - 2);
@@ -174,8 +172,8 @@ public class Movie {
         this.directors = directors;
     }
 
-    public void addDirectors(List<Object> directors) {
-        for (Object director : directors) {
+    public void addDirectors(ArrayList<Object> directors) {
+        for (Object director : directors){
             String directorName = ((String)director).split("\\(")[0].trim();
             if (!this.directors.contains(directorName)){
                 this.directors.add(directorName);
@@ -191,14 +189,13 @@ public class Movie {
      * @return HTML formatted list of actors.
      */
     public String getStringHTMLActors(){
-        if(!this.actors.isEmpty()){
+        if(!this.directors.isEmpty()){
 
             // Convertir l'ArrayList en une chaîne de caractères
             StringBuilder sb = new StringBuilder();
             sb.append("<html>\n");
             for (String element : this.actors) {
-                String clean = element.replace("\"", "").trim();
-                sb.append("<p>\n").append(clean).append("</p>\n");
+                sb.append("<p>\n").append(element).append("</p>\n");
             }
             // Supprimer la virgule et l'espace supplémentaires à la fin
             sb.substring(0, sb.length() - 2);
@@ -212,7 +209,7 @@ public class Movie {
     public void setActors(ArrayList<String> actors) {
         this.actors = actors;
     }
-    public void addActors(List<Object> actors) {
+    public void addActors(ArrayList<Object> actors) {
         for (Object actor : actors){
             String actorName = ((String)actor).split("\\(")[0].trim();
             if (!this.actors.contains(actorName)){
@@ -230,14 +227,13 @@ public class Movie {
      * @return HTML formatted list of producers.
      */
     public String getStringHTMLProducers(){
-        if(!this.producers.isEmpty()){
+        if(!this.directors.isEmpty()){
 
             // Convertir l'ArrayList en une chaîne de caractères
             StringBuilder sb = new StringBuilder();
             sb.append("<html>\n");
             for (String element : this.producers) {
-                String clean = element.replace("\"", "").trim();
-                sb.append("<p>\n").append(clean).append("</p>\n");
+                sb.append("<p>\n").append(element).append("</p>\n");
             }
 
 
@@ -252,7 +248,7 @@ public class Movie {
     public void setProducers(ArrayList<String> producers) {
         this.producers = producers;
     }
-    public void addProducers(List<Object> producers) {
+    public void addProducers(ArrayList<Object> producers) {
         for (Object producer : producers){
             String producerName = ((String)producer).split("\\(")[0].trim();
             if (!this.producers.contains(producerName)){

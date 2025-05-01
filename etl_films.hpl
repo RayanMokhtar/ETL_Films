@@ -1,0 +1,668 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<pipeline>
+  <info>
+    <name>etl_films</name>
+    <name_sync_with_filename>N</name_sync_with_filename>
+    <description>traitement etl films</description>
+    <extended_description/>
+    <pipeline_version/>
+    <pipeline_type>Normal</pipeline_type>
+    <pipeline_status>0</pipeline_status>
+    <parameters>
+    </parameters>
+    <capture_transform_performance>N</capture_transform_performance>
+    <transform_performance_capturing_delay>1000</transform_performance_capturing_delay>
+    <transform_performance_capturing_size_limit>100</transform_performance_capturing_size_limit>
+    <created_user>-</created_user>
+    <created_date>2025/04/13 18:29:47.326</created_date>
+    <modified_user>-</modified_user>
+    <modified_date>2025/04/13 18:29:47.326</modified_date>
+  </info>
+  <notepads>
+  </notepads>
+  <order>
+    <hop>
+      <from>films dataset lecture</from>
+      <to>trim titre</to>
+      <enabled>Y</enabled>
+    </hop>
+    <hop>
+      <from>scrapping films </from>
+      <to>trim titre => titre</to>
+      <enabled>Y</enabled>
+    </hop>
+    <hop>
+      <from>trim titre</from>
+      <to>extraction année film</to>
+      <enabled>Y</enabled>
+    </hop>
+    <hop>
+      <from>extraction année film</from>
+      <to>Filtre date non nulles</to>
+      <enabled>Y</enabled>
+    </hop>
+    <hop>
+      <from>Filtre date non nulles</from>
+      <to>formattage prix</to>
+      <enabled>Y</enabled>
+    </hop>
+    <hop>
+      <from>Filtre date non nulles</from>
+      <to>Text file output</to>
+      <enabled>Y</enabled>
+    </hop>
+    <hop>
+      <from>jointure en mémoire ( stream lookup ) </from>
+      <to>insertion / update en base </to>
+      <enabled>Y</enabled>
+    </hop>
+    <hop>
+      <from>insertion / update en base </from>
+      <to>enregistrements retournés par exception</to>
+      <enabled>Y</enabled>
+    </hop>
+    <hop>
+      <from>formattage prix</from>
+      <to>jointure en mémoire ( stream lookup ) </to>
+      <enabled>Y</enabled>
+    </hop>
+    <hop>
+      <from>trim titre => titre</from>
+      <to>jointure en mémoire ( stream lookup ) </to>
+      <enabled>Y</enabled>
+    </hop>
+  </order>
+  <transform>
+    <name>Filtre date non nulles</name>
+    <type>FilterRows</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+    <partitioning>
+      <method>none</method>
+      <schema_name/>
+    </partitioning>
+    <compare>
+      <condition>
+        <conditions>
+</conditions>
+        <function>IS NOT NULL</function>
+        <leftvalue>Release Date</leftvalue>
+        <negated>N</negated>
+        <operator>-</operator>
+      </condition>
+    </compare>
+    <send_false_to>Text file output</send_false_to>
+    <send_true_to>formattage prix</send_true_to>
+    <attributes/>
+    <GUI>
+      <xloc>432</xloc>
+      <yloc>32</yloc>
+    </GUI>
+  </transform>
+  <transform>
+    <name>Text file output</name>
+    <type>TextFileOutput</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+    <partitioning>
+      <method>none</method>
+      <schema_name/>
+    </partitioning>
+    <separator>;</separator>
+    <enclosure>"</enclosure>
+    <enclosure_forced>N</enclosure_forced>
+    <enclosure_fix_disabled>N</enclosure_fix_disabled>
+    <header>Y</header>
+    <footer>N</footer>
+    <format>DOS</format>
+    <compression>None</compression>
+    <encoding>UTF-8</encoding>
+    <endedLine/>
+    <fileNameInField>N</fileNameInField>
+    <fileNameField/>
+    <create_parent_folder>Y</create_parent_folder>
+    <file>
+      <name>file</name>
+      <servlet_output>N</servlet_output>
+      <do_not_open_new_file_init>Y</do_not_open_new_file_init>
+      <extention>txt</extention>
+      <append>N</append>
+      <split>N</split>
+      <haspartno>N</haspartno>
+      <add_date>N</add_date>
+      <add_time>N</add_time>
+      <SpecifyFormat>N</SpecifyFormat>
+      <date_time_format/>
+      <add_to_result_filenames>Y</add_to_result_filenames>
+      <pad>N</pad>
+      <fast_dump>N</fast_dump>
+      <splitevery/>
+    </file>
+    <fields>
+    </fields>
+    <attributes/>
+    <GUI>
+      <xloc>656</xloc>
+      <yloc>48</yloc>
+    </GUI>
+  </transform>
+  <transform>
+    <name>enregistrements retournés par exception</name>
+    <type>TextFileOutput</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+    <partitioning>
+      <method>none</method>
+      <schema_name/>
+    </partitioning>
+    <separator>;</separator>
+    <enclosure>"</enclosure>
+    <enclosure_forced>N</enclosure_forced>
+    <enclosure_fix_disabled>N</enclosure_fix_disabled>
+    <header>Y</header>
+    <footer>N</footer>
+    <format>DOS</format>
+    <compression>None</compression>
+    <encoding/>
+    <endedLine/>
+    <fileNameInField>N</fileNameInField>
+    <fileNameField/>
+    <create_parent_folder>Y</create_parent_folder>
+    <file>
+      <name>file</name>
+      <servlet_output>N</servlet_output>
+      <do_not_open_new_file_init>Y</do_not_open_new_file_init>
+      <extention>txt</extention>
+      <append>N</append>
+      <split>N</split>
+      <haspartno>N</haspartno>
+      <add_date>N</add_date>
+      <add_time>N</add_time>
+      <SpecifyFormat>N</SpecifyFormat>
+      <date_time_format/>
+      <add_to_result_filenames>Y</add_to_result_filenames>
+      <pad>N</pad>
+      <fast_dump>N</fast_dump>
+      <splitevery/>
+    </file>
+    <fields>
+      <field>
+        <name>Movie</name>
+        <type>String</type>
+        <format/>
+        <currency/>
+        <decimal/>
+        <group/>
+        <nullif/>
+        <trim_type>none</trim_type>
+        <length>87</length>
+        <precision>-1</precision>
+      </field>
+      <field>
+        <name>Release Date</name>
+        <type>Date</type>
+        <format/>
+        <currency/>
+        <decimal/>
+        <group/>
+        <nullif/>
+        <trim_type>none</trim_type>
+        <length>-1</length>
+        <precision>-1</precision>
+      </field>
+    </fields>
+    <attributes/>
+    <GUI>
+      <xloc>1120</xloc>
+      <yloc>240</yloc>
+    </GUI>
+  </transform>
+  <transform>
+    <name>extraction année film</name>
+    <type>Calculator</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+    <partitioning>
+      <method>none</method>
+      <schema_name/>
+    </partitioning>
+    <calculation>
+      <calc_type>YEAR_OF_DATE</calc_type>
+      <field_a>Release Date</field_a>
+      <field_name>Année</field_name>
+      <remove>N</remove>
+      <value_length>-1</value_length>
+      <value_precision>-1</value_precision>
+      <value_type>Integer</value_type>
+    </calculation>
+    <failIfNoFile>Y</failIfNoFile>
+    <attributes/>
+    <GUI>
+      <xloc>368</xloc>
+      <yloc>128</yloc>
+    </GUI>
+  </transform>
+  <transform>
+    <name>films dataset lecture</name>
+    <type>CSVInput</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+    <partitioning>
+      <method>none</method>
+      <schema_name/>
+    </partitioning>
+    <filename>C:\Users\mokht\git\ETL_Films\ETL_Films\movieBudgets.csv</filename>
+    <filename_field/>
+    <rownum_field/>
+    <include_filename>N</include_filename>
+    <separator>	</separator>
+    <enclosure>"</enclosure>
+    <header>Y</header>
+    <buffer_size>50000</buffer_size>
+    <lazy_conversion>Y</lazy_conversion>
+    <add_filename_result>N</add_filename_result>
+    <parallel>Y</parallel>
+    <newline_possible>N</newline_possible>
+    <encoding/>
+    <fields>
+      <field>
+        <name>index</name>
+        <type>Number</type>
+        <format>#.#</format>
+        <currency>$</currency>
+        <decimal>.</decimal>
+        <group>,</group>
+        <length>15</length>
+        <precision>1</precision>
+        <trim_type>both</trim_type>
+      </field>
+      <field>
+        <name>Release Date</name>
+        <type>Date</type>
+        <format>MM/dd/yyyy</format>
+        <currency>$</currency>
+        <decimal>,</decimal>
+        <group> </group>
+        <length>11</length>
+        <precision>-1</precision>
+        <trim_type>none</trim_type>
+      </field>
+      <field>
+        <name>Movie</name>
+        <type>String</type>
+        <format/>
+        <currency>$</currency>
+        <decimal>,</decimal>
+        <group> </group>
+        <length>87</length>
+        <precision>-1</precision>
+        <trim_type>none</trim_type>
+      </field>
+      <field>
+        <name>Production Budget</name>
+        <type>String</type>
+        <format>$#,##0.00</format>
+        <currency>$</currency>
+        <decimal>.</decimal>
+        <group>,</group>
+        <length>15</length>
+        <precision>2</precision>
+        <trim_type>both</trim_type>
+      </field>
+      <field>
+        <name>Domestic Gross</name>
+        <type>String</type>
+        <format>$#,##0.00</format>
+        <currency>$</currency>
+        <decimal>.</decimal>
+        <group>,</group>
+        <length>15</length>
+        <precision>2</precision>
+        <trim_type>both</trim_type>
+      </field>
+      <field>
+        <name>Worldwide Gross</name>
+        <type>String</type>
+        <format>$#,##0.00</format>
+        <currency>$</currency>
+        <decimal>.</decimal>
+        <group>,</group>
+        <length>15</length>
+        <precision>2</precision>
+        <trim_type>none</trim_type>
+      </field>
+    </fields>
+    <attributes/>
+    <GUI>
+      <xloc>64</xloc>
+      <yloc>128</yloc>
+    </GUI>
+  </transform>
+  <transform>
+    <name>formattage prix</name>
+    <type>ReplaceString</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+    <partitioning>
+      <method>none</method>
+      <schema_name/>
+    </partitioning>
+    <fields>
+      <field>
+        <case_sensitive>N</case_sensitive>
+        <in_stream_name>Domestic Gross</in_stream_name>
+        <is_unicode>N</is_unicode>
+        <out_stream_name>Domestic Gross nettoye</out_stream_name>
+        <replace_string>[\$,]</replace_string>
+        <set_empty_string>Y</set_empty_string>
+        <use_regex>Y</use_regex>
+        <whole_word>N</whole_word>
+      </field>
+      <field>
+        <case_sensitive>N</case_sensitive>
+        <in_stream_name>Worldwide Gross</in_stream_name>
+        <is_unicode>N</is_unicode>
+        <out_stream_name>Worldwide Gross nettoye</out_stream_name>
+        <replace_string>[\$,]</replace_string>
+        <set_empty_string>Y</set_empty_string>
+        <use_regex>Y</use_regex>
+        <whole_word>N</whole_word>
+      </field>
+      <field>
+        <case_sensitive>N</case_sensitive>
+        <in_stream_name>Production Budget</in_stream_name>
+        <is_unicode>N</is_unicode>
+        <out_stream_name>Production nettoye</out_stream_name>
+        <replace_string>[\$,]</replace_string>
+        <set_empty_string>Y</set_empty_string>
+        <use_regex>Y</use_regex>
+        <whole_word>N</whole_word>
+      </field>
+    </fields>
+    <attributes/>
+    <GUI>
+      <xloc>544</xloc>
+      <yloc>96</yloc>
+    </GUI>
+  </transform>
+  <transform>
+    <name>insertion / update en base </name>
+    <type>InsertUpdate</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+    <partitioning>
+      <method>none</method>
+      <schema_name/>
+    </partitioning>
+    <commit>1</commit>
+    <connection>mysql connexion</connection>
+    <lookup>
+      <key>
+        <condition>=</condition>
+        <field>release_date</field>
+        <name>Release Date</name>
+      </key>
+      <key>
+        <condition>=</condition>
+        <field>movie</field>
+        <name>Movie</name>
+      </key>
+      <schema>`mokhtari-rayan_etl`</schema>
+      <table>Film</table>
+      <value>
+        <name>movie</name>
+        <rename>Movie</rename>
+        <update>Y</update>
+      </value>
+      <value>
+        <name>distributeur</name>
+        <rename>Distributeur</rename>
+        <update>Y</update>
+      </value>
+      <value>
+        <name>release_date</name>
+        <rename>Release Date</rename>
+        <update>Y</update>
+      </value>
+      <value>
+        <name>domestic_gross</name>
+        <rename>Domestic Gross nettoye</rename>
+        <update>Y</update>
+      </value>
+      <value>
+        <name>production_budget</name>
+        <rename>Production nettoye</rename>
+        <update>Y</update>
+      </value>
+      <value>
+        <name>genre</name>
+        <rename>Genre</rename>
+        <update>Y</update>
+      </value>
+      <value>
+        <name>worldwide_gross</name>
+        <rename>Worldwide Gross nettoye</rename>
+        <update>Y</update>
+      </value>
+    </lookup>
+    <update_bypassed>N</update_bypassed>
+    <attributes/>
+    <GUI>
+      <xloc>864</xloc>
+      <yloc>240</yloc>
+    </GUI>
+  </transform>
+  <transform>
+    <name>jointure en mémoire ( stream lookup ) </name>
+    <type>StreamLookup</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+    <partitioning>
+      <method>none</method>
+      <schema_name/>
+    </partitioning>
+    <from/>
+    <input_sorted>N</input_sorted>
+    <preserve_memory>Y</preserve_memory>
+    <sorted_list>N</sorted_list>
+    <integer_pair>N</integer_pair>
+    <lookup>
+      <key>
+        <name>titre_nettoye</name>
+        <field>titre_nettoye</field>
+      </key>
+      <key>
+        <name>Année</name>
+        <field>Année</field>
+      </key>
+      <value>
+        <name>Genre</name>
+        <rename>Genre</rename>
+        <default/>
+        <type>String</type>
+      </value>
+      <value>
+        <name>Distributeur</name>
+        <rename>Distributeur</rename>
+        <default/>
+        <type>String</type>
+      </value>
+    </lookup>
+    <attributes/>
+    <GUI>
+      <xloc>624</xloc>
+      <yloc>256</yloc>
+    </GUI>
+  </transform>
+  <transform>
+    <name>scrapping films </name>
+    <type>CSVInput</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+    <partitioning>
+      <method>none</method>
+      <schema_name/>
+    </partitioning>
+    <filename>C:\Users\mokht\git\ETL_Films\ETL_Films\films.csv</filename>
+    <filename_field/>
+    <rownum_field/>
+    <include_filename>N</include_filename>
+    <separator>;</separator>
+    <enclosure>"</enclosure>
+    <header>Y</header>
+    <buffer_size>50000</buffer_size>
+    <lazy_conversion>N</lazy_conversion>
+    <add_filename_result>N</add_filename_result>
+    <parallel>Y</parallel>
+    <newline_possible>N</newline_possible>
+    <encoding>UTF-8</encoding>
+    <fields>
+      <field>
+        <name>Genre</name>
+        <type>String</type>
+        <format/>
+        <currency>$</currency>
+        <decimal>,</decimal>
+        <group> </group>
+        <length>9</length>
+        <precision>-1</precision>
+        <trim_type>both</trim_type>
+      </field>
+      <field>
+        <name>Année</name>
+        <type>Integer</type>
+        <format>#</format>
+        <currency>$</currency>
+        <decimal>,</decimal>
+        <group> </group>
+        <length>15</length>
+        <precision>0</precision>
+        <trim_type>none</trim_type>
+      </field>
+      <field>
+        <name>Titre</name>
+        <type>String</type>
+        <format/>
+        <currency>$</currency>
+        <decimal>,</decimal>
+        <group> </group>
+        <length>66</length>
+        <precision>-1</precision>
+        <trim_type>none</trim_type>
+      </field>
+      <field>
+        <name>Distributeur</name>
+        <type>String</type>
+        <format/>
+        <currency>$</currency>
+        <decimal>,</decimal>
+        <group> </group>
+        <length>52</length>
+        <precision>-1</precision>
+        <trim_type>none</trim_type>
+      </field>
+    </fields>
+    <attributes/>
+    <GUI>
+      <xloc>64</xloc>
+      <yloc>256</yloc>
+    </GUI>
+  </transform>
+  <transform>
+    <name>trim titre</name>
+    <type>StringOperations</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+    <partitioning>
+      <method>none</method>
+      <schema_name/>
+    </partitioning>
+    <fields>
+      <field>
+        <in_stream_name>Movie</in_stream_name>
+        <out_stream_name>titre_nettoye</out_stream_name>
+        <trim_type>both</trim_type>
+        <lower_upper>lower</lower_upper>
+        <padding_type>none</padding_type>
+        <pad_char/>
+        <pad_len/>
+        <init_cap>no</init_cap>
+        <mask_xml>none</mask_xml>
+        <digits>none</digits>
+        <remove_special_characters>none</remove_special_characters>
+      </field>
+    </fields>
+    <attributes/>
+    <GUI>
+      <xloc>224</xloc>
+      <yloc>128</yloc>
+    </GUI>
+  </transform>
+  <transform>
+    <name>trim titre => titre</name>
+    <type>StringOperations</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+    <partitioning>
+      <method>none</method>
+      <schema_name/>
+    </partitioning>
+    <fields>
+      <field>
+        <in_stream_name>Titre</in_stream_name>
+        <out_stream_name>titre_nettoye</out_stream_name>
+        <trim_type>both</trim_type>
+        <lower_upper>lower</lower_upper>
+        <padding_type>none</padding_type>
+        <pad_char/>
+        <pad_len/>
+        <init_cap>no</init_cap>
+        <mask_xml>none</mask_xml>
+        <digits>none</digits>
+        <remove_special_characters>none</remove_special_characters>
+      </field>
+    </fields>
+    <attributes/>
+    <GUI>
+      <xloc>240</xloc>
+      <yloc>256</yloc>
+    </GUI>
+  </transform>
+  <transform_error_handling>
+    <error>
+      <source_transform>insertion / update en base </source_transform>
+      <target_transform>enregistrements retournés par exception</target_transform>
+      <is_enabled>Y</is_enabled>
+      <nr_valuename/>
+      <descriptions_valuename/>
+      <fields_valuename/>
+      <codes_valuename/>
+      <max_errors/>
+      <max_pct_errors/>
+      <min_pct_rows/>
+    </error>
+  </transform_error_handling>
+  <attributes/>
+</pipeline>

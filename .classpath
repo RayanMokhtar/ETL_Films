@@ -1,54 +1,60 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
-	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-17">
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/jdk-11.0.26.4-hotspot">
 		<attributes>
 			<attribute name="module" value="true"/>
 		</attributes>
 	</classpathentry>
 	<classpathentry kind="src" path="src"/>
-	<classpathentry kind="lib" path="C:/Users/darkf/Downloads/jena/collection-0.7.jar"/>
-	<classpathentry kind="lib" path="C:/Users/darkf/Downloads/jena/commons-cli-1.5.0.jar"/>
-	<classpathentry kind="lib" path="C:/Users/darkf/Downloads/jena/log4j-slf4j-impl-2.20.0.jar"/>
-	<classpathentry kind="lib" path="C:/Users/darkf/Downloads/jena/protobuf-java-3.22.2.jar"/>
-	<classpathentry kind="lib" path="C:/Users/darkf/Downloads/jena/slf4j-api-1.7.36.jar"/>
-	<classpathentry kind="lib" path="C:/Users/darkf/Downloads/jena/titanium-json-ld-1.3.2.jar"/>
-	<classpathentry kind="lib" path="C:/Users/darkf/Downloads/jena/jena-iri-4.8.0.jar"/>
-	<classpathentry kind="lib" path="C:/Users/darkf/Downloads/jena/jena-rdfconnection-4.8.0.jar"/>
-	<classpathentry kind="lib" path="C:/Users/darkf/Downloads/jena/jena-rdfpatch-4.8.0.jar"/>
-	<classpathentry kind="lib" path="C:/Users/darkf/Downloads/jena/jena-shacl-4.8.0.jar"/>
-	<classpathentry kind="lib" path="C:/Users/darkf/Downloads/jena/jena-shaded-guava-4.8.0.jar"/>
-	<classpathentry kind="lib" path="C:/Users/darkf/Downloads/jena/jena-shex-4.8.0.jar"/>
-	<classpathentry kind="lib" path="C:/Users/darkf/Downloads/jena/jena-tdb2-4.8.0.jar"/>
-	<classpathentry kind="lib" path="C:/Users/darkf/Downloads/jena/jena-tdb-4.8.0.jar"/>
-	<classpathentry kind="lib" path="C:/Users/darkf/Downloads/jena/jsonld-java-0.13.4.jar"/>
-	<classpathentry kind="lib" path="C:/Users/darkf/Downloads/jena/libthrift-0.18.1.jar"/>
-	<classpathentry kind="lib" path="C:/Users/darkf/Downloads/jena/log4j-api-2.20.0.jar"/>
-	<classpathentry kind="lib" path="C:/Users/darkf/Downloads/jena/log4j-core-2.20.0.jar"/>
-	<classpathentry kind="lib" path="C:/Users/darkf/Downloads/jena/jena-arq-4.8.0.jar"/>
-	<classpathentry kind="lib" path="C:/Users/darkf/Downloads/jena/jena-base-4.8.0.jar"/>
-	<classpathentry kind="lib" path="C:/Users/darkf/Downloads/jena/jena-cmds-4.8.0.jar"/>
-	<classpathentry kind="lib" path="C:/Users/darkf/Downloads/jena/jena-core-4.8.0.jar"/>
-	<classpathentry kind="lib" path="C:/Users/darkf/Downloads/jena/jena-dboe-base-4.8.0.jar"/>
-	<classpathentry kind="lib" path="C:/Users/darkf/Downloads/jena/jena-dboe-index-4.8.0.jar"/>
-	<classpathentry kind="lib" path="C:/Users/darkf/Downloads/jena/jena-dboe-storage-4.8.0.jar"/>
-	<classpathentry kind="lib" path="C:/Users/darkf/Downloads/jena/jena-dboe-transaction-4.8.0.jar"/>
-	<classpathentry kind="lib" path="C:/Users/darkf/Downloads/jena/jena-dboe-trans-data-4.8.0.jar"/>
-	<classpathentry kind="lib" path="C:/Users/darkf/Downloads/jena/commons-codec-1.15.jar"/>
-	<classpathentry kind="lib" path="C:/Users/darkf/Downloads/jena/commons-compress-1.23.0.jar"/>
-	<classpathentry kind="lib" path="C:/Users/darkf/Downloads/jena/commons-csv-1.10.0.jar"/>
-	<classpathentry kind="lib" path="C:/Users/darkf/Downloads/jena/commons-io-2.11.0.jar"/>
-	<classpathentry kind="lib" path="C:/Users/darkf/Downloads/jena/commons-lang3-3.12.0.jar"/>
-	<classpathentry kind="lib" path="C:/Users/darkf/Downloads/jena/gson-2.10.1.jar"/>
-	<classpathentry kind="lib" path="C:/Users/darkf/Downloads/jena/httpclient-4.5.14.jar"/>
-	<classpathentry kind="lib" path="C:/Users/darkf/Downloads/jena/httpclient-cache-4.5.14.jar"/>
-	<classpathentry kind="lib" path="C:/Users/darkf/Downloads/jena/httpcore-4.4.16.jar"/>
-	<classpathentry kind="lib" path="C:/Users/darkf/Downloads/jena/jackson-annotations-2.14.2.jar"/>
-	<classpathentry kind="lib" path="C:/Users/darkf/Downloads/jena/jackson-core-2.14.2.jar"/>
-	<classpathentry kind="lib" path="C:/Users/darkf/Downloads/jena/jackson-databind-2.14.2.jar"/>
-	<classpathentry kind="lib" path="C:/Users/darkf/Downloads/jena/jakarta.json-2.0.1.jar"/>
-	<classpathentry kind="lib" path="C:/Users/darkf/Downloads/jena/jcl-over-slf4j-1.7.36.jar"/>
 	<classpathentry kind="lib" path="C:/Users/darkf/Downloads/jena/jsoup-1.19.1.jar"/>
 	<classpathentry kind="lib" path="C:/Users/darkf/Downloads/jena/mysql-connector-j-9.2.0.jar"/>
 	<classpathentry kind="lib" path="C:/Users/darkf/Downloads/jena/mssql-jdbc-12.4.1.jre11.jar"/>
+	<classpathentry kind="lib" path="C:/Users/darkf/Desktop/lib/collection-0.7.jar"/>
+	<classpathentry kind="lib" path="C:/Users/darkf/Desktop/lib/commons-cli-1.5.0.jar"/>
+	<classpathentry kind="lib" path="C:/Users/darkf/Desktop/lib/commons-codec-1.15.jar"/>
+	<classpathentry kind="lib" path="C:/Users/darkf/Desktop/lib/commons-compress-1.22.jar"/>
+	<classpathentry kind="lib" path="C:/Users/darkf/Desktop/lib/commons-csv-1.9.0.jar"/>
+	<classpathentry kind="lib" path="C:/Users/darkf/Desktop/lib/commons-io-2.11.0.jar"/>
+	<classpathentry kind="lib" path="C:/Users/darkf/Desktop/lib/commons-lang3-3.12.0.jar"/>
+	<classpathentry kind="lib" path="C:/Users/darkf/Desktop/lib/gson-2.10.jar"/>
+	<classpathentry kind="lib" path="C:/Users/darkf/Desktop/lib/httpclient-4.5.13.jar"/>
+	<classpathentry kind="lib" path="C:/Users/darkf/Desktop/lib/httpclient-cache-4.5.13.jar"/>
+	<classpathentry kind="lib" path="C:/Users/darkf/Desktop/lib/httpcore-4.4.16.jar"/>
+	<classpathentry kind="lib" path="C:/Users/darkf/Desktop/lib/jackson-annotations-2.14.1.jar"/>
+	<classpathentry kind="lib" path="C:/Users/darkf/Desktop/lib/jackson-core-2.14.1.jar"/>
+	<classpathentry kind="lib" path="C:/Users/darkf/Desktop/lib/jackson-databind-2.14.1.jar"/>
+	<classpathentry kind="lib" path="C:/Users/darkf/Desktop/lib/jakarta.json-2.0.1.jar"/>
+	<classpathentry kind="lib" path="C:/Users/darkf/Desktop/lib/jcl-over-slf4j-1.7.36.jar"/>
+	<classpathentry kind="lib" path="C:/Users/darkf/Desktop/lib/jena-arq-4.7.0.jar"/>
+	<classpathentry kind="lib" path="C:/Users/darkf/Desktop/lib/jena-base-4.7.0.jar"/>
+	<classpathentry kind="lib" path="C:/Users/darkf/Desktop/lib/jena-cmds-4.7.0.jar"/>
+	<classpathentry kind="lib" path="C:/Users/darkf/Desktop/lib/jena-core-4.7.0.jar"/>
+	<classpathentry kind="lib" path="C:/Users/darkf/Desktop/lib/jena-dboe-base-4.7.0.jar"/>
+	<classpathentry kind="lib" path="C:/Users/darkf/Desktop/lib/jena-dboe-index-4.7.0.jar"/>
+	<classpathentry kind="lib" path="C:/Users/darkf/Desktop/lib/jena-dboe-storage-4.7.0.jar"/>
+	<classpathentry kind="lib" path="C:/Users/darkf/Desktop/lib/jena-dboe-transaction-4.7.0.jar"/>
+	<classpathentry kind="lib" path="C:/Users/darkf/Desktop/lib/jena-dboe-trans-data-4.7.0.jar"/>
+	<classpathentry kind="lib" path="C:/Users/darkf/Desktop/lib/jena-iri-4.7.0.jar"/>
+	<classpathentry kind="lib" path="C:/Users/darkf/Desktop/lib/jena-rdfconnection-4.7.0.jar"/>
+	<classpathentry kind="lib" path="C:/Users/darkf/Desktop/lib/jena-rdfpatch-4.7.0.jar"/>
+	<classpathentry kind="lib" path="C:/Users/darkf/Desktop/lib/jena-shacl-4.7.0.jar"/>
+	<classpathentry kind="lib" path="C:/Users/darkf/Desktop/lib/jena-shaded-guava-4.7.0.jar"/>
+	<classpathentry kind="lib" path="C:/Users/darkf/Desktop/lib/jena-shex-4.7.0.jar"/>
+	<classpathentry kind="lib" path="C:/Users/darkf/Desktop/lib/jena-tdb2-4.7.0.jar"/>
+	<classpathentry kind="lib" path="C:/Users/darkf/Desktop/lib/jena-tdb-4.7.0.jar"/>
+	<classpathentry kind="lib" path="C:/Users/darkf/Desktop/lib/jsonld-java-0.13.4.jar"/>
+	<classpathentry kind="lib" path="C:/Users/darkf/Desktop/lib/libthrift-0.17.0.jar"/>
+	<classpathentry kind="lib" path="C:/Users/darkf/Desktop/lib/log4j-api-2.19.0.jar"/>
+	<classpathentry kind="lib" path="C:/Users/darkf/Desktop/lib/log4j-core-2.19.0.jar"/>
+	<classpathentry kind="lib" path="C:/Users/darkf/Desktop/lib/log4j-slf4j-impl-2.19.0.jar"/>
+	<classpathentry kind="lib" path="C:/Users/darkf/Desktop/lib/protobuf-java-3.21.10.jar"/>
+	<classpathentry kind="lib" path="C:/Users/darkf/Desktop/lib/slf4j-api-1.7.36.jar"/>
+	<classpathentry kind="lib" path="C:/Users/darkf/Desktop/lib/titanium-json-ld-1.3.1.jar"/>
+	<classpathentry kind="lib" path="C:/Users/darkf/Desktop/lib-src/jena-arq-4.7.0-sources.jar"/>
+	<classpathentry kind="lib" path="C:/Users/darkf/Desktop/lib-src/jena-cmds-4.7.0-sources.jar"/>
+	<classpathentry kind="lib" path="C:/Users/darkf/Desktop/lib-src/jena-core-4.7.0-sources.jar"/>
+	<classpathentry kind="lib" path="C:/Users/darkf/Desktop/lib-src/jena-rdfconnection-4.7.0-sources.jar"/>
+	<classpathentry kind="lib" path="C:/Users/darkf/Desktop/lib-src/jena-shacl-4.7.0-sources.jar"/>
+	<classpathentry kind="lib" path="C:/Users/darkf/Desktop/lib-src/jena-shex-4.7.0-sources.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
