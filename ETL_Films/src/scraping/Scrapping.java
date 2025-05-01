@@ -14,7 +14,7 @@ import java.util.HashMap;
  * This class realizes a web scraping operation applied to the site "the-numbers.com".
  *
  * */
-public class TheNumbersScraper {
+public class Scrapping {
 	public static void main(String[] args) {
 		// Liste des genres
 		String[] genres = {"Adventure", "Comedy", "Drama", "Action", "Thriller-or-Suspense", "Romantic-Comedy"};
