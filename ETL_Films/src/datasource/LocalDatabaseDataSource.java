@@ -8,7 +8,7 @@ import java.util.ArrayList;
  * This class handles database connections and movie data retrieval operations.
  * It implements the DataSource interface for consistent integration with other components.
  */
-public class LocalDatabaseDataSource{
+public class LocalDatabaseDataSource {
     // Database connection configuration
     private static final String HOST = "mysql-mokhtari-rayan.alwaysdata.net";
     private static final String BASE = "mokhtari-rayan_etl";
@@ -60,13 +60,11 @@ public class LocalDatabaseDataSource{
     
 
     // deux fonctions pour recherche de films par titre et acteur 
-    @Override
     public ArrayList<Object> getMovieByTitle(String movieTitle, boolean sensibleCasse) {
         return searchMoviesInDatabase(movieTitle, sensibleCasse);
     }
     
     //mm quand acteur , on a pas besoin de changer le nom de la fonction => reste un titre , mais on garde le nom de la fonction  pour plus de clarté 
-    @Override
     public ArrayList<Object> getMoviesByActor(String titleFromActorNameRetriever , boolean sensibleCasse) {
         return searchMoviesInDatabase(titleFromActorNameRetriever, sensibleCasse);
     }

@@ -100,7 +100,6 @@ public class OMDbDataSource{
 
 
 
-    @Override
     public ArrayList<Object> getMovieByTitle(String movieTitle, boolean caseSensitive) {
         ArrayList<Object> results = new ArrayList<>();
         
@@ -119,7 +118,6 @@ public class OMDbDataSource{
     
 	
    
-    @Override
     public ArrayList<Object> getMoviesByActor(String actorName, boolean caseSensitive) {
         logger.info("Searching by actor name is not supported in OMDb API");
         return new ArrayList<>();

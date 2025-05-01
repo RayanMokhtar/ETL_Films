@@ -25,7 +25,7 @@ import java.util.logging.Logger;
 import java.util.logging.SimpleFormatter;
 
 import repository.MovieRepository;
-import repository.MovieRepositoryConcrete;
+import repository.Mediator;
 import java.util.logging.ConsoleHandler;
 import java.util.logging.Handler;
 import java.util.logging.Level;
@@ -35,7 +35,7 @@ import java.util.logging.SimpleFormatter;
 
 
  public class FacadeClient{
-     private static MovieRepository repository = new MovieRepositoryConcrete();
+     private static MovieRepository repository = new Mediator();
     
     
     
@@ -74,7 +74,7 @@ private static void configureLogging(boolean verbose) {
 
     // 5) Propagation du niveau aux classes qui ont leur propre setVerboseLogging
     //    Exemple pour votre repository
-    MovieRepositoryConcrete.setVerboseLogging(verbose);
+    Mediator.setVerboseLogging(verbose);
 }
      
     public static void main(String[] args) {
